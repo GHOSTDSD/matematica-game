@@ -1,0 +1,128 @@
+/* Define o estilo global da página */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e6e6e6;
+}
+
+/* Estilo do quadrado */
+.center-square {
+    width: 150px;
+    height: 150px;
+    background-color: #131313;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    position: relative;
+    transform: rotate(0deg); /* Inicia sem rotação */
+    transition: transform 1s ease; /* Suaviza a rotação */
+}
+
+/* Estilo da contagem regressiva */
+.regressiva {
+    font-size: 48px;
+    color: #ffffff;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Container das partículas de vento */
+.wind-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* Estilo das partículas de vento (retângulos) */
+.wind-particle {
+    position: absolute;
+    width: 50px;
+    height: 5px;
+    background-color: rgba(143, 143, 143, 0.7);
+    opacity: 0;
+    border-radius: 2px;
+}
+
+.wind1 {
+    top: -20px;
+    left: -60px;
+    animation: wind1 1s ease-in-out infinite paused;
+}
+
+.wind2 {
+    top: 50%;
+    right: -70px;
+    animation: wind2 1s ease-in-out infinite paused;
+}
+
+.wind3 {
+    bottom: -30px;
+    left: -100px;
+    animation: wind3 1s ease-in-out infinite paused;
+}
+
+/* Animação dos retângulos simulando vento */
+@keyframes wind1 {
+    0% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(100px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(150px);
+    }
+}
+
+@keyframes wind2 {
+    0% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-100px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-150px);
+    }
+}
+
+@keyframes wind3 {
+    0% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(150px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(200px);
+    }
+}
+
+/* Estilo do retângulo que preenche a tela após a contagem */
+.fullscreen-rect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #131313;
+    width: 0; /* Inicialmente não visível */
+    transition: width 1s ease-out, width 1s 1s ease-in; /* Animação fluida */
+    z-index: 10; /* Coloca o retângulo acima de tudo */
+}

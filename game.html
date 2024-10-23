@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Leitura de Gráfico</title>
+    <link rel="stylesheet" href="game.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9ecef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Centraliza verticalmente */
+            height: 100vh; /* Altura total da janela */
+            color: #333;
+        }
+        h1 {
+            margin: 20px 0;
+            color: #007bff;
+        }
+        .container {
+            max-width: 600px;
+            width: 90%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .chart {
+            width: 100%; /* Largura total do gráfico */
+            max-width: 400px; /* Largura máxima para evitar esticamento */
+            height: auto; /* Altura automática */
+            aspect-ratio: 4 / 3; /* Mantém uma proporção de 4:3 */
+            margin: 0 auto 20px; /* Centraliza e adiciona margem inferior */
+        }
+        .options {
+            display: grid; /* Utiliza grid para opções em colunas */
+            grid-template-columns: repeat(2, 1fr); /* Duas colunas */
+            gap: 10px; /* Espaçamento entre as opções */
+        }
+        .option {
+            padding: 15px;
+            background-color: #1f1f1f;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .option:hover {
+            background-color: rgb(41, 41, 41);
+            transform: scale(1.05);
+        }
+        .option.correct {
+            background-color: #28a745; /* Verde para resposta correta */
+            color: white;
+            transform: scale(1.1);
+        }
+        .option.incorrect {
+            background-color: #dc3545; /* Vermelho para resposta incorreta */
+            color: white;
+        }
+        #additional-text {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        @media (max-width: 600px) {
+            .chart {
+                max-width: 100%; /* Largura máxima em dispositivos móveis */
+                height: 200px; /* Gráfico menor em dispositivos móveis */
+            }
+            .option {
+                padding: 10px; /* Reduz o padding das opções */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="question">
+            <h2 id="question-text">Qual é a alternativa correta?</h2>
+            <canvas class="chart" id="chart"></canvas>
+            <p id="additional-text">Qual é a resposta correta?</p>
+        </div>
+        <div class="options" id="options">
+            <!-- Opções serão geradas dinamicamente -->
+        </div>
+    </div>
+
+    <div id="fullscreenRect" class="fullscreen-rect"></div> <!-- Retângulo de preenchimento -->
+
+    <script>
+        const fullscreenRect = document.getElementById('fullscreenRect'); // Seleciona o retângulo
+        const questionText = document.getElementById('question-text');
+        const additionalText = document.getElementById('additional-text');
+        const optionsContainer = document.getElementById('options');
+        const canvas = document.getElementById('chart');
+        const ctx = canvas.getContext('2d');
+
+        // Ajusta o tamanho do canvas
+        canvas.width = 400; // Largura do canvas
+        canvas.height = 300; // Altura do canvas
+
+        // Perguntas, respostas e dados do gráfico
+        const questions = [
+            {
+                question: "Qual produto teve o maior aumento percentual nas vendas?",
+                answers: ["Produto A (20%)", "Produto B (10%)", "Produto C (30%)", "Produto D (40%)"],
+                correct: "Produto D (40%)",
+                values: [20, 10, 30, 40]
+            },
+            {
+                question: "Qual produto teve o pior desempenho em comparação ao mês anterior?",
+                answers: ["Produto A (10)", "Produto B (30)", "Produto C (20)", "Produto D (5)"],
+                correct: "Produto D (5)",
+                values: [10, 30, 20, 5] // Valores representando desempenho
+            },
+            {
+                question: "Considerando os produtos, qual teve o menor valor total de vendas?",
+                answers: ["Produto A (100)", "Produto B (300)", "Produto C (400)", "Produto D (200)"],
+                correct: "Produto A (100)",
+                values: [100, 300, 400, 200] // Vendas totais
+            },
+            {
+                question: "Qual produto teve vendas consistentes, mantendo-se acima da média do mês?",
+                answers: ["Produto A (80)", "Produto B (75)", "Produto C (60)", "Produto D (90)"],
+                correct: "Produto B (75)",
+                values: [80, 75, 60, 90] // Valores representando vendas mensais
+            },
+            {
+                question: "Entre os produtos, qual teve a maior variação nas vendas ao longo dos meses?",
+                answers: ["Produto A (10)", "Produto B (50)", "Produto C (80)", "Produto D (60)"],
+                correct: "Produto C (80)",
+                values: [10, 60, 80, 50] // Valores de vendas ao longo do tempo
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = question.question;
+            additionalText.textContent = "Qual é a resposta correta?";
+            optionsContainer.innerHTML = ""; // Limpa as opções anteriores
+
+            question.answers.forEach(answer => {
+                const option = document.createElement('div');
+                option.className = 'option';
+                option.textContent = answer;
+                option.onclick = () => checkAnswer(option, answer, question.correct, question.values);
+                optionsContainer.appendChild(option);
+            });
+
+            drawChart(question.values); // Atualiza o gráfico ao carregar a pergunta
+        }
+
+        function drawChart(values) {
+            const total = values.reduce((acc, val) => acc + val, 0);
+            const colors = ['#ff6384', '#36a2eb', '#ffce56', '#4caf50'];
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa o canvas
+
+            let startAngle = 0; // Ângulo inicial
+
+            values.forEach((value, index) => {
+                const sliceAngle = (value / total) * (Math.PI * 2); // Cálculo do ângulo da fatia
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, canvas.height / 2); // Move para o centro
+                ctx.arc(canvas.width / 2, canvas.height / 2, 100, startAngle, startAngle + sliceAngle); // Desenha a fatia
+                ctx.fillStyle = colors[index];
+                ctx.fill(); // Preenche a fatia
+                startAngle += sliceAngle; // Atualiza o ângulo inicial
+            });
+        }
+
+        function animateFullscreenRect() {
+            fullscreenRect.style.width = '100%'; // Preenche a tela
+            setTimeout(() => {
+                fullscreenRect.style.width = '0'; // Volta a 0 após preencher
+            }, 2000); // Tempo para o retângulo preencher
+        }
+
+        function checkAnswer(optionElement, selected, correct) {
+            animateFullscreenRect();
+
+            if (selected === correct) {
+                optionElement.classList.add('correct'); // Destaca a resposta correta
+                console.log('Correto!');
+            } else {
+                optionElement.classList.add('incorrect'); // Destaca a resposta incorreta
+            }
+
+            // Desativa todas as opções após a resposta
+            const options = optionsContainer.querySelectorAll('.option');
+            options.forEach(opt => opt.onclick = null); // Remove o evento de clique
+
+            setTimeout(() => {
+                if (selected === correct) {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < questions.length) {
+                        loadQuestion(); // Carrega a próxima pergunta
+                    } else {
+                        questionText.textContent = "Fim do jogo!";
+                        optionsContainer.innerHTML = ""; // Limpa as opções
+                    }
+                } else {
+                    loadQuestion(); // Carrega a mesma pergunta novamente
+                }
+            }, 2000); // Tempo de espera para a animação
+        }
+
+        window.onload = loadQuestion; // Carrega a primeira pergunta ao abrir
+    </script>
+</body>
+</html>

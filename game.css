@@ -1,0 +1,106 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f3f4f6; /* Cor de fundo suave */
+    margin: 0;
+    padding: 20px; /* Espaçamento generoso nas bordas */
+}
+
+.container {
+    max-width: 600px; /* Largura máxima da página */
+    margin: auto; /* Centraliza o container */
+    text-align: center; /* Centraliza o texto */
+    background: #ffffff; /* Fundo branco para o container */
+    border-radius: 12px; /* Bordas arredondadas */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    padding: 20px; /* Espaçamento interno do container */
+}
+
+h1 {
+    color: #4B0082; /* Cor vibrante para o título */
+    font-size: 2.5rem; /* Tamanho do título */
+    margin-bottom: 20px; /* Espaço abaixo do título */
+}
+
+.question {
+    margin-bottom: 20px; /* Espaço entre a pergunta e as opções */
+}
+
+.chart {
+    display: flex;
+    justify-content: space-between; /* Espaço uniforme entre as barras */
+    align-items: flex-end; /* Alinha as barras no fundo */
+    height: 220px; /* Altura total do gráfico */
+    margin: 0 10px; /* Espaço lateral para o gráfico */
+}
+
+.bar {
+    width: 20%; /* Largura das barras do gráfico */
+    height: 0; /* Inicia com altura 0 para a animação */
+    animation: grow 1s ease forwards; /* Animação de crescimento */
+    position: relative; /* Para posicionar os rótulos corretamente */
+    transition: background-color 0.3s; /* Efeito de transição suave */
+    border-radius: 8px; /* Bordas arredondadas nas barras */
+    margin-top: 10px; /* Espaço entre as barras */
+    background-color: #FF6384; /* Cor padrão das barras */
+}
+
+.bar:nth-child(2) { background-color: #36A2EB; } /* Cor da barra B */
+.bar:nth-child(3) { background-color: #FFCE56; } /* Cor da barra C */
+.bar:nth-child(4) { background-color: #4BC0C0; } /* Cor da barra D */
+
+.bar-label {
+    position: absolute; /* Para posicionar abaixo da barra */
+    bottom: -30px; /* Espaço abaixo da barra */
+    left: 50%; /* Centraliza o texto horizontalmente */
+    transform: translateX(-50%); /* Ajusta a centralização */
+    font-size: 14px; /* Tamanho da fonte dos rótulos */
+    color: #333; /* Cor do texto */
+    font-weight: bold; /* Destaque nos rótulos */
+}
+
+@keyframes grow {
+    from {
+        height: 0;
+    }
+    to {
+        height: var(--height); /* Usa a altura definida inline */
+    }
+}
+
+.options {
+    display: flex;
+    flex-direction: column; /* Exibe as opções em coluna */
+    gap: 10px; /* Espaçamento entre as opções */
+    margin-top: 20px; /* Espaço acima das opções */
+}
+
+.option {
+    background-color: #007BFF; /* Cor de fundo para as opções */
+    color: #ffffff; /* Cor do texto das opções */
+    border: none; /* Remove a borda padrão */
+    border-radius: 8px; /* Bordas arredondadas */
+    padding: 15px; /* Espaço interno das opções */
+    font-size: 16px; /* Tamanho da fonte das opções */
+    cursor: pointer; /* Cursor em forma de ponteiro para as opções */
+    transition: background-color 0.3s, transform 0.3s; /* Efeito de transição suave */
+}
+
+.option:hover {
+    background-color: #0056b3; /* Cor de fundo ao passar o mouse */
+    transform: translateY(-3px); /* Efeito de elevação */
+}
+
+.fullscreen-rect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #131313;
+    width: 0; /* Inicialmente não visível */
+    transition: width 1s ease-out, width 1s 1s ease-in; /* Animação fluida */
+    z-index: 10; /* Coloca o retângulo acima de tudo */
+}
